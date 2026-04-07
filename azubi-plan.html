@@ -116,9 +116,24 @@
     .card-title { font-size: 13px; }
     .plan-header { padding: 24px 16px 20px; }
   }
+
+  .print-btn { position: fixed; bottom: 20px; right: 20px; z-index: 99; background: linear-gradient(135deg,var(--ac),var(--ac2)); color: #fff; border: none; border-radius: 14px; padding: 12px 20px; font-size: 13px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 20px rgba(37,99,235,0.3); display: flex; align-items: center; gap: 6px; transition: transform 0.2s; }
+  .print-btn:hover { transform: scale(1.05); }
+
+  @media print {
+    .print-btn, .progress-bar, .legend, .doc-zone, .toggle-btn { display: none !important; }
+    .plan-header { padding: 20px !important; }
+    .phase-banner { position: static !important; }
+    .tl-card { break-inside: avoid; }
+    .skills-list { display: block !important; }
+    .tl-item { opacity: 1 !important; transform: none !important; animation: none !important; }
+    body { background: #fff !important; color: #000 !important; }
+  }
 </style>
 </head>
 <body class="lang-de">
+
+<button class="print-btn" onclick="window.print()">🖨️ <span class="de">Drucken / PDF</span><span class="vi">In / PDF</span></button>
 
 <div class="plan-header">
   <h1>
