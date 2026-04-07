@@ -729,7 +729,7 @@
           })()}
 
           {/* PLAN (Azubi only) */}
-          {vw === "plan" && <div style={{ borderRadius: 12, overflow: "hidden", border: "1px solid var(--bd)", height: "calc(100vh - 130px)" }}><iframe key={`plan-${lang}-${dark}`} src={`azubi-plan.html?lang=${lang}&dark=${dark?1:0}`} style={{ width: "100%", height: "100%", border: "none" }} title="Ausbildungsplan" /></div>}
+          {vw === "plan" && <div style={{ borderRadius: 12, overflow: "hidden", border: "1px solid var(--bd)", height: "calc(100vh - 130px)" }}><iframe key={`plan-${lang}-${dark}`} src={`azubi-plan.html?lang=${lang}&dark=${dark?1:0}&role=${role}`} style={{ width: "100%", height: "100%", border: "none" }} title="Ausbildungsplan" /></div>}
 
           {/* FILES */}
 

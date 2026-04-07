@@ -89,6 +89,19 @@
   .int-card p { font-size: 11px; opacity: 0.75; line-height: 1.6; }
   .int-tag { display: inline-block; font-size: 8px; letter-spacing: 2px; padding: 2px 8px; border-radius: 10px; background: rgba(255,255,255,0.1); margin-bottom: 8px; font-weight: 600; }
 
+  .doc-zone { margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--bd); }
+  .doc-zone.has-docs { display: block; }
+  .doc-header { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .doc-count { font-size: 9px; font-weight: 700; color: var(--ac); background: rgba(37,99,235,0.1); padding: 1px 7px; border-radius: 10px; }
+  .doc-upload-btn { background: none; border: 1px solid var(--ac); border-radius: 6px; padding: 2px 8px; font-size: 9px; font-weight: 700; color: var(--ac); cursor: pointer; transition: all 0.15s; }
+  .doc-upload-btn:hover { background: rgba(37,99,235,0.08); }
+  .doc-item { display: flex; align-items: center; gap: 6px; padding: 4px 0; font-size: 11px; border-bottom: 1px dashed var(--bd); }
+  .doc-item:last-child { border-bottom: none; }
+  .doc-item a { color: var(--ac); text-decoration: none; font-weight: 500; flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .doc-item a:hover { text-decoration: underline; }
+  .doc-del { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 13px; padding: 0 2px; }
+  .doc-date { font-size: 9px; color: var(--tx2); flex-shrink: 0; }
+
   @media (max-width: 600px) {
     .tl-item { grid-template-columns: 44px 1px 1fr; gap: 0 8px; }
     .phase-num { font-size: 28px; }
@@ -356,13 +369,97 @@
   <div class="int-card"><div class="int-tag">D · 5</div><h3>🧼 <span class="de">Hygienemaßnahmen</span><span class="vi">Các biện pháp vệ sinh</span></h3><p><span class="de">HACCP-Konzept, Personalhygiene, Schädlingsbefall erkennen.</span><span class="vi">HACCP, vệ sinh cá nhân, nhận biết sâu bọ gây hại.</span></p></div>
 </div>
 
+<input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx,.xls,.xlsx,.pptx,.txt,.csv,.mp4" style="display:none">
+
 <script>
-  // Read params from parent
   const params = new URLSearchParams(window.location.search);
   const lang = params.get('lang') || 'de';
   const dark = params.get('dark') === '1';
+  const userRole = params.get('role') || 'azubi';
+  const canEdit = userRole === 'admin' || userRole === 'management';
   document.body.className = 'lang-' + lang;
   if (dark) document.documentElement.setAttribute('data-dark', 'true');
+
+  // Supabase
+  const SB_URL = 'https://bjhdiiimrhvgnegvcpci.supabase.co';
+  const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqaGRpaWltcmh2Z25lZ3ZjcGNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxMTkzNTEsImV4cCI6MjA5MDY5NTM1MX0.xtra1oFgbM0a6rT6eOEaPO0_j0mpZnyGKYFFbPkK9nc';
+  const sbH = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+
+  let allDocs = [];
+  let uploadTarget = null;
+
+  function getPlanId(card) {
+    const badge = card.querySelector('.card-badge span');
+    if (!badge) { const tag = card.querySelector('.int-tag'); return tag ? tag.textContent.replace(/\s*·\s*/g,'') : null; }
+    return badge.textContent.replace(/\s*·\s*/g, '');
+  }
+
+  async function loadDocs() {
+    try {
+      const r = await fetch(SB_URL + '/rest/v1/sd_files?select=*&data->>type=eq.azubi_doc', { headers: sbH });
+      const rows = await r.json();
+      allDocs = rows.map(r => ({ id: r.id, ...r.data }));
+    } catch(e) { console.warn('Load docs err:', e); }
+    renderDocs();
+  }
+
+  async function uploadDoc(file, planId) {
+    const reader = new FileReader();
+    reader.onload = async () => {
+      const meta = { id: 'ap' + Date.now(), type: 'azubi_doc', skillId: 'plan_' + planId, empId: '', fileName: file.name, mimeType: file.type, size: file.size, downloadUrl: reader.result, uploadedAt: new Date().toISOString() };
+      try {
+        await fetch(SB_URL + '/rest/v1/sd_files', { method: 'POST', headers: { ...sbH, 'Prefer': 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ id: meta.id, data: meta, updated_at: new Date().toISOString() }) });
+        allDocs.push(meta);
+        renderDocs();
+      } catch(e) { alert('Upload error: ' + e.message); }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  async function deleteDoc(docId) {
+    if (!confirm(lang === 'de' ? 'Dokument löschen?' : 'Xóa tài liệu?')) return;
+    try {
+      await fetch(SB_URL + '/rest/v1/sd_files?id=eq.' + encodeURIComponent(docId), { method: 'DELETE', headers: sbH });
+      allDocs = allDocs.filter(d => d.id !== docId);
+      renderDocs();
+    } catch(e) { console.error(e); }
+  }
+
+  function renderDocs() {
+    document.querySelectorAll('.doc-zone').forEach(z => z.remove());
+    const cards = [...document.querySelectorAll('.tl-card'), ...document.querySelectorAll('.int-card')];
+    cards.forEach(card => {
+      const pid = getPlanId(card);
+      if (!pid) return;
+      const docs = allDocs.filter(d => d.skillId === 'plan_' + pid);
+      if (docs.length === 0 && !canEdit) return;
+      const zone = document.createElement('div');
+      zone.className = 'doc-zone';
+      let html = '<div class="doc-header"><span style="font-size:10px;font-weight:700;color:var(--tx2)">📎 ' + (lang === 'de' ? 'Dokumente' : 'Tài liệu') + '</span>';
+      if (docs.length > 0) html += '<span class="doc-count">' + docs.length + '</span>';
+      if (canEdit) html += '<button class="doc-upload-btn" onclick="event.stopPropagation();startUpload(\'' + pid + '\')">' + (lang === 'de' ? '+ Hochladen' : '+ Tải lên') + '</button>';
+      html += '</div>';
+      docs.forEach(d => {
+        const date = new Date(d.uploadedAt).toLocaleDateString(lang === 'de' ? 'de-DE' : 'vi-VN');
+        const icon = d.mimeType?.includes('pdf') ? '📄' : d.mimeType?.includes('image') ? '🖼' : '📁';
+        html += '<div class="doc-item">' + icon + ' <a href="' + d.downloadUrl + '" target="_blank" onclick="event.stopPropagation()">' + d.fileName + '</a><span class="doc-date">' + date + '</span>';
+        if (canEdit) html += '<button class="doc-del" onclick="event.stopPropagation();deleteDoc(\'' + d.id + '\')">&times;</button>';
+        html += '</div>';
+      });
+      zone.innerHTML = html;
+      card.appendChild(zone);
+    });
+  }
+
+  function startUpload(pid) {
+    uploadTarget = pid;
+    document.getElementById('fileInput').click();
+  }
+
+  document.getElementById('fileInput').addEventListener('change', e => {
+    if (e.target.files[0] && uploadTarget) uploadDoc(e.target.files[0], uploadTarget);
+    e.target.value = '';
+  });
 
   function toggle(card) { card.classList.toggle('open'); }
   function showTab(tab) {
@@ -371,6 +468,8 @@
     document.getElementById('tab-' + tab).classList.add('active');
     document.querySelector('.tab-btn.' + tab).classList.add('active');
   }
+
+  loadDocs();
 </script>
 </body>
 </html>
