@@ -369,7 +369,7 @@
     Object.entries(CL).forEach(([ck, c]) => c.subs.forEach(s => { s.ck = ck; s.cc = c.color; s.ci = c.icon; s.cl = c.label; }));
     function rebuildCL() { applyLang(); ALL_SUBS = Object.values(CL).flatMap(c => c.subs); ALL_IDS = ALL_SUBS.map(s => s.id); SM = {}; ALL_SUBS.forEach(s => { SM[s.id] = s; }); Object.entries(CL).forEach(([ck, c]) => c.subs.forEach(s => { s.ck = ck; s.cc = c.color; s.ci = c.icon; s.cl = c.label; })); }
     const LV = [{ v: 0, l: "—", c: "#cbd5e1" }, { v: 1, l: "1 – sehr gut", c: "#059669" }, { v: 2, l: "2 – gut", c: "#2563eb" }, { v: 3, l: "3 – befriedigend", c: "#eab308" }, { v: 4, l: "4 – ausreichend", c: "#ea580c" }, { v: 5, l: "5 – mangelhaft", c: "#dc2626" }];
-    const RL = { admin: { l: "Admin", i: "🛡️", n: 4 }, management: { l: "Management", i: "👔", n: 3 }, self: { l: "Mitarbeiter", i: "👤", n: 2 }, public: { l: "Team", i: "👥", n: 1 } };
+    const RL = { admin: { l: "Admin", i: "🛡️", n: 4 }, management: { l: "Management", i: "👔", n: 3 }, self: { l: "Mitarbeiter", i: "👤", n: 2 }, azubi: { l: "Azubi", i: "🎓", n: 2 }, public: { l: "Team", i: "👥", n: 1 } };
     const lc = v => LV[v]?.c || "#cbd5e1"; const lb = v => v > 0 ? `${lc(v)}18` : "transparent";
     const ini = n => n.split(" ").map(w => w[0]).join("").toUpperCase().slice(0, 2);
     const t5 = sk => Object.entries(sk || {}).filter(([, v]) => v > 0).sort((a, b) => a[1] - b[1]).slice(0, 5);
@@ -486,8 +486,8 @@
       function switchLang(l) { LANG = l; setLang(l); rebuildCL(); setClVer(v => v + 1); }
 
       // ─── Derived ───
-      const role = cu?.role || "public"; const myN = RL[role]?.n || 1; const ceA = role === "admin" || role === "management";
-      const myE = cu?.locs || null; const sE = emps.find(e => e.id === sel); const ceS = ceA || (role === "self" && sel === myE); const isP = role === "public";
+      const role = cu?.role || "public"; const myN = RL[role]?.n || 1; const ceA = role === "admin" || role === "management"; const isSelf = role === "self" || role === "azubi";
+      const myE = cu?.locs || null; const sE = emps.find(e => e.id === sel); const ceS = ceA || (isSelf && sel === myE); const isP = role === "public";
       function eRL(eid) { const u = users.find(x => x.locs === eid); return u ? RL[u.role]?.n || 1 : 1; }
       function cvD(eid) { if (role === "admin") return true; if (eid === myE) return true; return myN > eRL(eid); }
       function cuD(eid) { if (role === "admin") return true; if (eid === myE) return true; if (role === "management" && eRL(eid) < 3) return true; return false; }
@@ -497,7 +497,7 @@
       function docsFor(eid, sid) { return files.filter(f => f.type === "doc" && f.empId === eid && f.skillId === sid); }
       function tutsFor(sid) { return files.filter(f => f.type === "tutorial" && f.skillId === sid); }
 
-      const flt = React.useMemo(() => { let list = emps; if (role === "self" && myE) list = list.filter(e => e.id === myE); if (search) { const s = search.toLowerCase(); list = list.filter(e => e.name.toLowerCase().includes(s) || e.focus?.toLowerCase().includes(s)); } return list; }, [emps, search, role, myE]);
+      const flt = React.useMemo(() => { let list = emps; if (isSelf && myE) list = list.filter(e => e.id === myE); if (search) { const s = search.toLowerCase(); list = list.filter(e => e.name.toLowerCase().includes(s) || e.focus?.toLowerCase().includes(s)); } return list; }, [emps, search, role, myE]);
       const mS = React.useMemo(() => { const b = mc === "all" ? ALL_IDS : (CL[mc]?.subs || []).map(s => s.id); return b.filter(sid => iSV(sid)); }, [mc, cfg, myN]);
       const gaps = React.useMemo(() => ALL_IDS.filter(sid => iSV(sid)).map(sid => { const sub = SM[sid]; const lv = sub?.lv || 2; const rs = emps.map(e => e.skills[sid] || 0).filter(v => v > 0); const ex = rs.filter(v => v <= 2).length; const urg = lv === 1 ? 4 : lv === 2 ? 3 : lv === 3 ? 2 : 1; return { skill: sid, experts: ex, total: rs.length, min: rs.length > 0 ? Math.min(...rs) : 0, lv, urg }; }).filter(g => g.experts <= 1).sort((a, b) => b.urg - a.urg || a.experts - b.experts || b.total - a.total), [emps, cfg, myN]);
 
@@ -524,7 +524,7 @@
       // ─── Actions (all auto-save to Firebase) ───
       async function uSk(eid, sid, v) { const ne = emps.map(e => e.id === eid ? { ...e, skills: { ...e.skills, [sid]: v } } : e); setEmps(ne); const emp = ne.find(e => e.id === eid); if (emp) await FB.saveEmployee(emp); }
       async function uSf(eid, sid, v) { const ne = emps.map(e => e.id === eid ? { ...e, selfRatings: { ...(e.selfRatings || {}), [sid]: v } } : e); setEmps(ne); const emp = ne.find(e => e.id === eid); if (emp) await FB.saveEmployee(emp); }
-      async function doLi() { const h = await sha(lp); const u = mU(users, ln); if (u && u.pwHash === h) { setCu(u); setLe(""); setLn(""); setLp(""); if (u.locs) setSel(u.locs); if (u.role === "self") setVw("my"); } else setLe(u ? "Passwort falsch." : `Benutzer nicht gefunden (${users.length} geladen)`); }
+      async function doLi() { const h = await sha(lp); const u = mU(users, ln); if (u && u.pwHash === h) { setCu(u); setLe(""); setLn(""); setLp(""); if (u.locs) setSel(u.locs); if (u.role === "self" || u.role === "azubi") setVw("my"); } else setLe(u ? "Passwort falsch." : `Benutzer nicht gefunden (${users.length} geladen)`); }
       async function aE() { if (!nE.name.trim()) return; const id = "e" + Date.now(); const emp = { id, name: nE.name.trim(), focus: nE.focus.trim() || "Allgemein", avatar: ini(nE.name), skills: {}, selfRatings: {}, goals: [] }; setEmps(p => [...p, emp]); await FB.saveEmployee(emp); const pw = nE.name.trim().toLowerCase().split(" ")[0] + "2024"; const h = await sha(pw); const usr = { id: "u" + Date.now(), name: nE.name.trim(), role: nE.role, locs: id, pwHash: h }; setUsers(p => [...p, usr]); await FB.saveUser(usr); setNE({ name: "", focus: "", role: "self" }); setShAE(false); }
       async function aU() { if (!nU.name.trim() || !nU.password.trim()) return; const h = await sha(nU.password.trim()); const usr = { id: "u" + Date.now(), name: nU.name.trim(), role: nU.role, locs: nU.locs, pwHash: h }; setUsers(p => [...p, usr]); await FB.saveUser(usr); setNU({ name: "", password: "", role: "self", locs: "" }); setShAU(false); }
       async function dE(id) { setEmps(p => p.filter(e => e.id !== id)); await FB.deleteEmployee(id); const u = users.find(x => x.locs === id); if (u) { setUsers(p => p.map(x => x.id === u.id ? { ...x, locs: "" } : x)); await FB.saveUser({ ...u, locs: "" }); } if (sel === id) setSel(null); }
@@ -598,11 +598,11 @@
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 2, padding: "4px 0", overflowX: "auto" }}>
             {[
-              ...(role !== "self" ? [{ k: "matrix", l: t.matrix, i: "▦" }, { k: "profiles", l: t.profiles, i: "◉" }] : []),
-              ...(role === "self" && myE ? [{ k: "my", l: t.myprof, i: "◎" }] : []),
+              ...(!isSelf ? [{ k: "matrix", l: t.matrix, i: "▦" }, { k: "profiles", l: t.profiles, i: "◉" }] : []),
+              ...(isSelf && myE ? [{ k: "my", l: t.myprof, i: "◎" }] : []),
               { k: "gaps", l: t.gaps, i: "⚠" },
               { k: "training", l: lang === "vn" ? "📚 Luyện tập" : "📚 Training", i: "📚" },
-
+              ...(role === "azubi" ? [{ k: "plan", l: lang === "vn" ? "📋 Kế hoạch" : "📋 Ausbildungsplan", i: "📋" }] : []),
               ...(role === "admin" ? [{ k: "files", l: t.files, i: "📁" }, { k: "settings", l: "⚙️ Settings", i: "⚙️" }] : [])
             ].map(v => <button key={v.k} onClick={() => { setVw(v.k); if (v.k === "my") setSel(myE); }} style={{ padding: "4px 10px", borderRadius: 6, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", background: vw === v.k ? (dark ? "var(--ac)" : "#0f172a") : "transparent", color: vw === v.k ? "#fff" : "var(--tx2)", whiteSpace: "nowrap" }}>{v.l}</button>)}
             <div style={{ flex: 1 }} />
@@ -727,6 +727,9 @@
             }
             return <div style={{ borderRadius: 12, overflow: "hidden", border: "1px solid var(--bd)", height: "calc(100vh - 130px)" }}><iframe src={trainingUrl} style={{ width: "100%", height: "100%", border: "none" }} title="Training" /></div>;
           })()}
+
+          {/* PLAN (Azubi only) */}
+          {vw === "plan" && role === "azubi" && <div style={{ borderRadius: 12, overflow: "hidden", border: "1px solid var(--bd)", height: "calc(100vh - 130px)" }}><iframe key={`plan-${lang}-${dark}`} src={`azubi-plan.html?lang=${lang}&dark=${dark?1:0}`} style={{ width: "100%", height: "100%", border: "none" }} title="Ausbildungsplan" /></div>}
 
           {/* FILES */}
 
