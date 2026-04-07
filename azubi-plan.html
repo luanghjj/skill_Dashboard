@@ -102,6 +102,14 @@
   .doc-del { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 13px; padding: 0 2px; }
   .doc-date { font-size: 9px; color: var(--tx2); flex-shrink: 0; }
 
+  .progress-bar { display: flex; gap: 12px; padding: 16px 20px; background: var(--bg2); border-bottom: 1px solid var(--bd); flex-wrap: wrap; justify-content: center; }
+  .prog-card { flex: 1; min-width: 140px; max-width: 220px; background: var(--bg); border: 1px solid var(--bd); border-radius: 10px; padding: 12px 14px; text-align: center; }
+  .prog-label { font-size: 9px; font-weight: 700; letter-spacing: 1px; color: var(--tx2); margin-bottom: 6px; text-transform: uppercase; }
+  .prog-value { font-size: 22px; font-weight: 800; margin-bottom: 4px; }
+  .prog-track { height: 4px; border-radius: 99px; background: var(--bd); overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 99px; transition: width 0.6s ease; }
+  .prog-sub { font-size: 9px; color: var(--tx2); margin-top: 4px; }
+
   @media (max-width: 600px) {
     .tl-item { grid-template-columns: 44px 1px 1fr; gap: 0 8px; }
     .phase-num { font-size: 28px; }
@@ -119,6 +127,33 @@
   </h1>
   <p class="de">BERUFSAUSBILDUNG · 24 MONATE · DUALES SYSTEM</p>
   <p class="vi">ĐÀO TẠO NGHỀ · 24 THÁNG · HỆ SONG NGÀNH</p>
+</div>
+
+<div class="progress-bar" id="progressBar">
+  <div class="prog-card">
+    <div class="prog-label"><span class="de">Phase 1</span><span class="vi">Giai đoạn 1</span></div>
+    <div class="prog-value" id="prog1" style="color:var(--blue)">–</div>
+    <div class="prog-track"><div class="prog-fill" id="progFill1" style="width:0%;background:var(--blue)"></div></div>
+    <div class="prog-sub" id="progSub1">–</div>
+  </div>
+  <div class="prog-card">
+    <div class="prog-label"><span class="de">Phase 2</span><span class="vi">Giai đoạn 2</span></div>
+    <div class="prog-value" id="prog2" style="color:var(--green)">–</div>
+    <div class="prog-track"><div class="prog-fill" id="progFill2" style="width:0%;background:var(--green)"></div></div>
+    <div class="prog-sub" id="progSub2">–</div>
+  </div>
+  <div class="prog-card">
+    <div class="prog-label"><span class="de">Dokumente</span><span class="vi">Tài liệu</span></div>
+    <div class="prog-value" id="progDocs" style="color:var(--ac)">0</div>
+    <div class="prog-track"><div class="prog-fill" id="progFillDocs" style="width:0%;background:var(--ac)"></div></div>
+    <div class="prog-sub" id="progSubDocs">–</div>
+  </div>
+  <div class="prog-card">
+    <div class="prog-label"><span class="de">Gesamt</span><span class="vi">Tổng</span></div>
+    <div class="prog-value" id="progTotal" style="color:var(--purple)">–</div>
+    <div class="prog-track"><div class="prog-fill" id="progFillTotal" style="width:0%;background:var(--purple)"></div></div>
+    <div class="prog-sub" id="progSubTotal">–</div>
+  </div>
 </div>
 
 <div class="legend">
@@ -451,6 +486,31 @@
       zone.innerHTML = html;
       card.appendChild(zone);
     });
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const p1Ids = ['A1','A2','A3','A4'];
+    const p2Ids = ['A5','A6','B1','B2','C1','C2'];
+    const allIds = [...p1Ids, ...p2Ids, 'D1','D2','D3','D4','D5'];
+    const countDocs = ids => ids.filter(id => allDocs.some(d => d.skillId === 'plan_' + id)).length;
+    const p1Done = countDocs(p1Ids), p2Done = countDocs(p2Ids);
+    const p1Pct = Math.round((p1Done / p1Ids.length) * 100);
+    const p2Pct = Math.round((p2Done / p2Ids.length) * 100);
+    const totalDone = countDocs(allIds);
+    const totalPct = Math.round((totalDone / allIds.length) * 100);
+    document.getElementById('prog1').textContent = p1Pct + '%';
+    document.getElementById('progFill1').style.width = p1Pct + '%';
+    document.getElementById('progSub1').textContent = p1Done + '/' + p1Ids.length + (lang === 'de' ? ' Module' : ' module');
+    document.getElementById('prog2').textContent = p2Pct + '%';
+    document.getElementById('progFill2').style.width = p2Pct + '%';
+    document.getElementById('progSub2').textContent = p2Done + '/' + p2Ids.length + (lang === 'de' ? ' Module' : ' module');
+    document.getElementById('progDocs').textContent = allDocs.length;
+    document.getElementById('progFillDocs').style.width = Math.min(100, allDocs.length * 10) + '%';
+    document.getElementById('progSubDocs').textContent = (lang === 'de' ? 'Dateien hochgeladen' : 'file đã tải lên');
+    document.getElementById('progTotal').textContent = totalPct + '%';
+    document.getElementById('progFillTotal').style.width = totalPct + '%';
+    document.getElementById('progSubTotal').textContent = totalDone + '/' + allIds.length + (lang === 'de' ? ' abgedeckt' : ' hoàn thành');
   }
 
   function startUpload(pid) {
