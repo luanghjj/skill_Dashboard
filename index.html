@@ -602,7 +602,7 @@
               ...(isSelf && myE ? [{ k: "my", l: t.myprof, i: "◎" }] : []),
               { k: "gaps", l: t.gaps, i: "⚠" },
               { k: "training", l: lang === "vn" ? "📚 Luyện tập" : "📚 Training", i: "📚" },
-              ...(role === "azubi" ? [{ k: "plan", l: lang === "vn" ? "📋 Kế hoạch" : "📋 Ausbildungsplan", i: "📋" }] : []),
+              ...(role === "azubi" || ceA ? [{ k: "plan", l: lang === "vn" ? "📋 Kế hoạch" : "📋 Ausbildungsplan", i: "📋" }] : []),
               ...(role === "admin" ? [{ k: "files", l: t.files, i: "📁" }, { k: "settings", l: "⚙️ Settings", i: "⚙️" }] : [])
             ].map(v => <button key={v.k} onClick={() => { setVw(v.k); if (v.k === "my") setSel(myE); }} style={{ padding: "4px 10px", borderRadius: 6, border: "none", fontSize: 11, fontWeight: 600, cursor: "pointer", background: vw === v.k ? (dark ? "var(--ac)" : "#0f172a") : "transparent", color: vw === v.k ? "#fff" : "var(--tx2)", whiteSpace: "nowrap" }}>{v.l}</button>)}
             <div style={{ flex: 1 }} />
@@ -729,7 +729,7 @@
           })()}
 
           {/* PLAN (Azubi only) */}
-          {vw === "plan" && role === "azubi" && <div style={{ borderRadius: 12, overflow: "hidden", border: "1px solid var(--bd)", height: "calc(100vh - 130px)" }}><iframe key={`plan-${lang}-${dark}`} src={`azubi-plan.html?lang=${lang}&dark=${dark?1:0}`} style={{ width: "100%", height: "100%", border: "none" }} title="Ausbildungsplan" /></div>}
+          {vw === "plan" && <div style={{ borderRadius: 12, overflow: "hidden", border: "1px solid var(--bd)", height: "calc(100vh - 130px)" }}><iframe key={`plan-${lang}-${dark}`} src={`azubi-plan.html?lang=${lang}&dark=${dark?1:0}`} style={{ width: "100%", height: "100%", border: "none" }} title="Ausbildungsplan" /></div>}
 
           {/* FILES */}
 
