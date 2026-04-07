@@ -396,9 +396,11 @@
 
   async function loadDocs() {
     try {
-      const r = await fetch(SB_URL + '/rest/v1/sd_files?select=*&data->>type=eq.azubi_doc', { headers: sbH });
+      const r = await fetch(SB_URL + '/rest/v1/sd_files?select=*', { headers: sbH });
       const rows = await r.json();
-      allDocs = rows.map(r => ({ id: r.id, ...r.data }));
+      if (Array.isArray(rows)) {
+        allDocs = rows.filter(r => r.data && r.data.type === 'azubi_doc').map(r => ({ id: r.id, ...r.data }));
+      }
     } catch(e) { console.warn('Load docs err:', e); }
     renderDocs();
   }
