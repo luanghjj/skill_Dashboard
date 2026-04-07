@@ -615,6 +615,46 @@
 
           {/* MATRIX */}
           {vw === "matrix" && <div>
+            {ceA && (() => {
+              const totalSkills = ALL_IDS.length;
+              const teamAvgs = Object.entries(CL).map(([k, c]) => {
+                const vals = emps.flatMap(e => c.subs.map(s => e.skills[s.id] || 0)).filter(v => v > 0);
+                const avg = vals.length ? +(vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(1) : 0;
+                return { k, label: c.label.split("&")[0].trim(), icon: c.icon, color: c.color, avg, count: vals.length };
+              });
+              const allVals = emps.flatMap(e => ALL_IDS.map(s => e.skills[s] || 0)).filter(v => v > 0);
+              const globalAvg = allVals.length ? +(allVals.reduce((a,b) => a+b, 0) / allVals.length).toFixed(1) : 0;
+              const rated = ALL_IDS.filter(sid => emps.some(e => (e.skills[sid] || 0) > 0)).length;
+              const ratedPct = Math.round((rated / totalSkills) * 100);
+              const gapCount = gaps.length;
+              return <div style={{ display: "flex", gap: 10, marginBottom: 14, flexWrap: "wrap" }}>
+                <div className="dark-card" style={{ background: dark ? "#1e293b" : "#fff", borderRadius: 12, border: "1px solid var(--bd)", padding: "12px 16px", flex: "1 1 120px", minWidth: 120 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: "var(--tx2)", letterSpacing: 1, marginBottom: 4 }}>{lang === "de" ? "TEAM Ø" : "TB NHÓM"}</div>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: globalAvg <= 2 ? "var(--ok)" : globalAvg <= 3 ? "#eab308" : "var(--warn)" }}>{globalAvg || "–"}</div>
+                  <div style={{ fontSize: 10, color: "var(--tx2)" }}>{allVals.length} {lang === "de" ? "Bewertungen" : "đánh giá"}</div>
+                </div>
+                <div className="dark-card" style={{ background: dark ? "#1e293b" : "#fff", borderRadius: 12, border: "1px solid var(--bd)", padding: "12px 16px", flex: "1 1 120px", minWidth: 120 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: "var(--tx2)", letterSpacing: 1, marginBottom: 4 }}>{lang === "de" ? "ABDECKUNG" : "ĐỘ BAO PHỦ"}</div>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: "var(--ac)" }}>{ratedPct}%</div>
+                  <div style={{ height: 3, borderRadius: 99, background: dark ? "#334155" : "#e2e8f0", overflow: "hidden", marginTop: 4 }}><div style={{ height: "100%", width: `${ratedPct}%`, borderRadius: 99, background: "var(--ac)" }} /></div>
+                  <div style={{ fontSize: 10, color: "var(--tx2)", marginTop: 2 }}>{rated}/{totalSkills} Skills</div>
+                </div>
+                <div className="dark-card" style={{ background: dark ? "#1e293b" : "#fff", borderRadius: 12, border: "1px solid var(--bd)", padding: "12px 16px", flex: "1 1 120px", minWidth: 120 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: "var(--tx2)", letterSpacing: 1, marginBottom: 4 }}>GAPS</div>
+                  <div style={{ fontSize: 26, fontWeight: 800, color: gapCount > 0 ? "var(--danger)" : "var(--ok)" }}>{gapCount}</div>
+                  <div style={{ fontSize: 10, color: "var(--tx2)" }}>{lang === "de" ? "Lücken gefunden" : "lỗ hổng phát hiện"}</div>
+                </div>
+                <div className="dark-card" style={{ background: dark ? "#1e293b" : "#fff", borderRadius: 12, border: "1px solid var(--bd)", padding: "12px 16px", flex: "2 1 240px", minWidth: 200 }}>
+                  <div style={{ fontSize: 9, fontWeight: 700, color: "var(--tx2)", letterSpacing: 1, marginBottom: 6 }}>{lang === "de" ? "CLUSTER-DURCHSCHNITT" : "TRUNG BÌNH NHÓM"}</div>
+                  {teamAvgs.map(c => <div key={c.k} style={{ display: "flex", alignItems: "center", gap: 6, padding: "2px 0" }}>
+                    <span style={{ fontSize: 10, width: 14 }}>{c.icon}</span>
+                    <span style={{ fontSize: 9, flex: 1, color: "var(--tx2)", fontWeight: 500 }}>{c.label}</span>
+                    <div style={{ width: 60, height: 3, borderRadius: 99, background: dark ? "#334155" : "#e2e8f0", overflow: "hidden" }}><div style={{ height: "100%", width: `${c.avg > 0 ? ((6-c.avg)/5)*100 : 0}%`, borderRadius: 99, background: c.color }} /></div>
+                    <span style={{ fontSize: 10, fontWeight: 700, fontFamily: "'JetBrains Mono',monospace", color: c.avg > 0 && c.avg <= 2 ? c.color : "var(--tx2)", minWidth: 18, textAlign: "right" }}>{c.avg || "–"}</span>
+                  </div>)}
+                </div>
+              </div>;
+            })()}
             <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
               <div className="cluster-scroll" style={{ flex: 1, minWidth: 0 }}>
                 <button onClick={() => setMc("all")} style={{ padding: "3px 9px", borderRadius: 6, border: "none", fontSize: 10, fontWeight: 600, cursor: "pointer", background: mc === "all" ? "#0f172a" : dark ? "#334155" : "#f1f5f9", color: mc === "all" ? "#fff" : "var(--tx2)", whiteSpace: "nowrap", flexShrink: 0 }}>{lang === "de" ? "Alle" : "Tất cả"}</button>
