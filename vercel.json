@@ -1,0 +1,7 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/newbe", "destination": "/newbe.html" },
+    { "source": "/azubi-plan", "destination": "/azubi-plan.html" }
+  ]
+}
