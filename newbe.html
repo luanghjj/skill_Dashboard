@@ -94,8 +94,13 @@
       <div class="section-title">📝 <span class="de">Persönliche Angaben</span><span class="vi">Thông tin cá nhân</span></div>
       <div class="card">
         <div class="field"><label><span class="de">Dein Name *</span><span class="vi">Tên của bạn *</span></label><input id="fname" required placeholder="z.B. Nguyen Van A"></div>
-        <div class="field"><label><span class="de">Gewünschte Position</span><span class="vi">Vị trí ứng tuyển</span></label>
-          <select id="fpos"><option value="Service">🛎️ Service</option><option value="Küche">🍳 Küche / Bếp</option><option value="Bar">🍸 Bar</option><option value="Sushi">🍣 Sushi</option><option value="Allrounder">⭐ Allrounder</option></select>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <div class="field" style="flex:1;min-width:140px"><label><span class="de">Geburtsdatum *</span><span class="vi">Ngày sinh *</span></label><input id="fdob" type="date" required></div>
+          <div class="field" style="flex:1;min-width:140px"><label><span class="de">Telefon *</span><span class="vi">Số điện thoại *</span></label><input id="fphone" type="tel" required placeholder="+49 170 …"></div>
+        </div>
+        <div class="field"><label>Email</label><input id="femail" type="email" placeholder="dein@email.de"></div>
+        <div class="field"><label><span class="de">Gewünschte Position *</span><span class="vi">Vị trí mong muốn *</span></label>
+          <select id="fpos"><option value="Service">🛎️ Service / Chạy bàn</option><option value="Küche">🍳 Küche / Bếp</option><option value="Bar">🍸 Bar</option><option value="Sushi">🍣 Sushi</option><option value="Allrounder">⭐ Allrounder / Linh hoạt</option></select>
         </div>
       </div>
     </div>
@@ -175,8 +180,11 @@ const QUESTIONS = [
   { id:'q4', req:true, tag:'🤝 Erwartungen', de:'Was erwartest du von uns als Arbeitgeber?', vn:'Bạn mong đợi điều gì từ chúng tôi với tư cách là nơi làm việc?' },
   { id:'q5', req:true, tag:'📈 Entwicklung', de:'Wo möchtest du dich in den nächsten 12 Monaten weiterentwickeln?', vn:'Trong 12 tháng tới, bạn muốn phát triển bản thân ở lĩnh vực nào?' },
   { id:'q6', req:true, tag:'✨ Persönliches Plus', de:'Was sollten wir über dich wissen, was nicht im Lebenslauf steht?', vn:'Có điều gì về bạn mà CV không nói đến, nhưng bạn muốn chúng tôi biết?' },
-  { id:'q7', req:false, tag:'🌐 Sprache', de:'In welcher Sprache fühlst du dich im Gästekontakt am wohlsten?', vn:'Bạn cảm thấy thoải mái nhất khi giao tiếp với khách bằng ngôn ngữ nào?' },
-  { id:'q8', req:false, tag:'📅 Verfügbarkeit', de:'Wie schnell kannst du frühestens anfangen, und welche Schichten passen am besten zu dir (Mittag, Abend, Wochenende)?', vn:'Bạn có thể bắt đầu làm việc sớm nhất khi nào, và ca nào phù hợp với bạn nhất (trưa, tối, cuối tuần)?' }
+  { id:'q7', req:true, tag:'🎓 Ausbildung', de:'Welche Ausbildung machst du gerade – in welchem Beruf und wo (Betrieb / Schule)?', vn:'Bạn đang học nghề gì – ngành nào và ở đâu (công ty / trường)?' },
+  { id:'q8', req:true, tag:'📋 Nebenjob-Erlaubnis', de:'Erlaubt dein Ausbildungsbetrieb dir, nebenbei zu arbeiten? (Hast du schon mit deinem Chef gesprochen?)', vn:'Bên Ausbildung có cho phép bạn làm thêm không? (Bạn đã hỏi sếp chính chưa?)' },
+  { id:'q9', req:true, tag:'📍 Wohnort', de:'Wo wohnst du gerade? (Stadtteil / Stadt)', vn:'Bạn đang ở đâu? (Quận / Thành phố)' },
+  { id:'q10', req:true, tag:'📅 Verfügbarkeit', de:'An welchen Tagen bist du verfügbar – und passt dir eher Mittagsschicht oder Abendschicht? (Wir brauchen vor allem Do – Sa Abend bis 22 Uhr)', vn:'Bạn rảnh ngày nào – và ca trưa hay ca tối phù hợp hơn? (Bên anh cần nhất ca tối thứ Năm – thứ Bảy đến 22h)' },
+  { id:'q11', req:false, tag:'🌐 Sprache', de:'In welcher Sprache fühlst du dich im Gästekontakt am wohlsten?', vn:'Bạn cảm thấy thoải mái nhất khi giao tiếp với khách bằng ngôn ngữ nào?' }
 ];
 
 // State
@@ -245,6 +253,9 @@ async function submitForm() {
     id: 'nb_' + Date.now(),
     type: 'newbe_form',
     name: name,
+    dob: document.getElementById('fdob').value,
+    phone: document.getElementById('fphone').value.trim(),
+    email: document.getElementById('femail').value.trim(),
     position: document.getElementById('fpos').value,
     selfRatings: { ...ratings },
     answers: answers,
