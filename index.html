@@ -11,6 +11,7 @@
   <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
   <!-- Supabase REST API (no SDK needed) -->
   <style>
     * {
@@ -464,6 +465,15 @@
 
     /* ═══════════════════ MAIN APP ═══════════════════ */
     const CAL_LINK = 'https://calendar.google.com/calendar/u/0/appointments/schedules/AcZssZ1aKaZqMCMM0KrLftnyGjoweXMT2p3SXFCAYG7VctNni5YA8NidD3M3GWhl9qD3vtiObpr9Kahf';
+    // ─── EmailJS Config ───
+    // 1. Go to https://www.emailjs.com → Sign Up
+    // 2. Email Services → Add Gmail → Connect
+    // 3. Email Templates → Create → use variables: {{to_email}}, {{to_name}}, {{subject}}, {{message}}
+    // 4. Fill in these 3 values:
+    const EJS_PUBLIC = 'YOUR_PUBLIC_KEY';   // Account → API Keys
+    const EJS_SERVICE = 'YOUR_SERVICE_ID';  // Email Services → Service ID
+    const EJS_TEMPLATE = 'YOUR_TEMPLATE_ID'; // Email Templates → Template ID
+    if (typeof emailjs !== 'undefined') emailjs.init(EJS_PUBLIC);
 
     function BewerbungenTab({ dark, lang }) {
       const [bew, setBew] = React.useState([]);
@@ -476,21 +486,29 @@
         try { await fetch(`${SB_URL}/rest/v1/sd_files`, { method: 'POST', headers: { ...sbHeaders, 'Prefer': 'resolution=merge-duplicates,return=minimal' }, body: JSON.stringify({ id: item.id, data: item, updated_at: new Date().toISOString() }) }); } catch(e) { console.error(e); }
       }
 
-      function mailAccept(b) {
-        const subj = encodeURIComponent(lang === 'de' ? `Einladung zum Vorstellungsgespräch – ${b.name}` : `Lời mời phỏng vấn – ${b.name}`);
-        const body = encodeURIComponent(lang === 'de'
+      async function mailAccept(b) {
+        if (!b.email) { alert('Kein Email vorhanden / Không có email'); return; }
+        const subj = lang === 'de' ? `Einladung zum Vorstellungsgespräch – ${b.name}` : `Lời mời phỏng vấn – ${b.name}`;
+        const msg = lang === 'de'
           ? `Hallo ${b.name.split(' ')[0]},\n\nvielen Dank für deine Bewerbung bei uns! Wir haben dein Profil angesehen und möchten dich gerne persönlich kennenlernen.\n\nBitte buche dir hier einen Termin für ein kurzes Vorstellungsgespräch:\n${CAL_LINK}\n\nWir freuen uns auf dich!\n\nViele Grüße\nDein Team`
-          : `Chào ${b.name.split(' ')[0]},\n\nCảm ơn bạn đã gửi hồ sơ cho chúng tôi! Chúng tôi đã xem qua và muốn gặp bạn trực tiếp.\n\nVui lòng chọn lịch hẹn phỏng vấn tại đây:\n${CAL_LINK}\n\nRất mong được gặp bạn!\n\nThân,\nĐội ngũ quản lý`);
-        window.open(`mailto:${b.email || ''}?subject=${subj}&body=${body}`, '_blank');
+          : `Chào ${b.name.split(' ')[0]},\n\nCảm ơn bạn đã gửi hồ sơ cho chúng tôi! Chúng tôi đã xem qua và muốn gặp bạn trực tiếp.\n\nVui lòng chọn lịch hẹn phỏng vấn tại đây:\n${CAL_LINK}\n\nRất mong được gặp bạn!\n\nThân,\nĐội ngũ quản lý`;
+        try {
+          if (EJS_PUBLIC.startsWith('YOUR')) { window.open(`mailto:${b.email}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(msg)}`, '_blank'); }
+          else { await emailjs.send(EJS_SERVICE, EJS_TEMPLATE, { to_email: b.email, to_name: b.name.split(' ')[0], subject: subj, message: msg }); alert(lang === 'de' ? '✅ Email gesendet!' : '✅ Đã gửi email!'); }
+        } catch(e) { console.error(e); alert('Email-Fehler: ' + e.text); }
         setStatus(b.id, 'accepted');
       }
 
-      function mailReject(b) {
-        const subj = encodeURIComponent(lang === 'de' ? `Deine Bewerbung – ${b.name}` : `Hồ sơ của bạn – ${b.name}`);
-        const body = encodeURIComponent(lang === 'de'
+      async function mailReject(b) {
+        if (!b.email) { alert('Kein Email vorhanden / Không có email'); return; }
+        const subj = lang === 'de' ? `Deine Bewerbung – ${b.name}` : `Hồ sơ của bạn – ${b.name}`;
+        const msg = lang === 'de'
           ? `Hallo ${b.name.split(' ')[0]},\n\nvielen Dank, dass du dir die Zeit genommen hast, dich bei uns zu bewerben. Wir haben dein Profil sorgfältig geprüft.\n\nLeider passt es zum jetzigen Zeitpunkt nicht ganz zu dem, was wir aktuell suchen. Das heißt aber nicht, dass sich das nicht ändern kann!\n\nWir würden uns freuen, wenn du dich in ein paar Monaten nochmal bei uns meldest – vielleicht ergibt sich dann eine passende Möglichkeit.\n\nAlles Gute und bis hoffentlich bald!\n\nViele Grüße\nDein Team`
-          : `Chào ${b.name.split(' ')[0]},\n\nCảm ơn bạn đã dành thời gian ứng tuyển. Chúng tôi đã xem xét hồ sơ của bạn rất kỹ.\n\nTuy nhiên, ở thời điểm hiện tại, vị trí chưa thật sự phù hợp. Nhưng điều đó không có nghĩa là cơ hội đã khép lại!\n\nChúng tôi rất vui nếu bạn liên hệ lại sau vài tháng – biết đâu lúc đó sẽ có vị trí phù hợp cho bạn.\n\nChúc bạn mọi điều tốt đẹp và hẹn gặp lại!\n\nThân,\nĐội ngũ quản lý`);
-        window.open(`mailto:${b.email || ''}?subject=${subj}&body=${body}`, '_blank');
+          : `Chào ${b.name.split(' ')[0]},\n\nCảm ơn bạn đã dành thời gian ứng tuyển. Chúng tôi đã xem xét hồ sơ của bạn rất kỹ.\n\nTuy nhiên, ở thời điểm hiện tại, vị trí chưa thật sự phù hợp. Nhưng điều đó không có nghĩa là cơ hội đã khép lại!\n\nChúng tôi rất vui nếu bạn liên hệ lại sau vài tháng – biết đâu lúc đó sẽ có vị trí phù hợp cho bạn.\n\nChúc bạn mọi điều tốt đẹp và hẹn gặp lại!\n\nThân,\nĐội ngũ quản lý`;
+        try {
+          if (EJS_PUBLIC.startsWith('YOUR')) { window.open(`mailto:${b.email}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(msg)}`, '_blank'); }
+          else { await emailjs.send(EJS_SERVICE, EJS_TEMPLATE, { to_email: b.email, to_name: b.name.split(' ')[0], subject: subj, message: msg }); alert(lang === 'de' ? '✅ Email gesendet!' : '✅ Đã gửi email!'); }
+        } catch(e) { console.error(e); alert('Email-Fehler: ' + e.text); }
         setStatus(b.id, 'rejected');
       }
 
