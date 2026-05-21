@@ -54,9 +54,13 @@
   .r-legend span{font-size:10px;display:flex;align-items:center;gap:4px;color:var(--tx2)}
   .r-legend .dot{width:10px;height:10px;border-radius:50%}
 
-  .q-card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;margin-bottom:10px}
-  .q-num{font-size:9px;font-weight:700;color:var(--ac);letter-spacing:1px;margin-bottom:4px}
-  .q-text{font-size:13px;font-weight:600;margin-bottom:8px;line-height:1.4}
+  .q-card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:16px 18px;margin-bottom:12px}
+  .q-num{font-size:10px;font-weight:700;color:var(--ac);letter-spacing:1px;margin-bottom:6px;display:flex;align-items:center;gap:6px}
+  .q-num .req{color:#ef4444;font-size:12px}
+  .q-text{font-size:14px;font-weight:600;margin-bottom:10px;line-height:1.5;color:#fff}
+  .q-card textarea{width:100%;padding:12px 14px;border-radius:10px;border:2px solid var(--bd);background:var(--bg);color:var(--tx);font-size:13px;font-family:inherit;outline:none;transition:border .2s;resize:vertical;min-height:90px;line-height:1.6}
+  .q-card textarea:focus{border-color:var(--ac);box-shadow:0 0 0 3px rgba(37,99,235,.15)}
+  .q-card textarea::placeholder{color:var(--tx2);font-style:italic}
 
   .submit-btn{width:100%;padding:16px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 24px rgba(37,99,235,.3);transition:transform .2s;display:flex;align-items:center;justify-content:center;gap:8px}
   .submit-btn:hover{transform:scale(1.02)}
@@ -96,6 +100,12 @@
       </div>
     </div>
 
+    <!-- QUESTIONS -->
+    <div class="section">
+      <div class="section-title">💬 <span class="de">Persönliche Fragen</span><span class="vi">Câu hỏi cá nhân</span> <span class="badge"><span class="de">6 PFLICHT + 2 OPTIONAL</span><span class="vi">6 BẮT BUỘC + 2 TÙY CHỌN</span></span></div>
+      <div id="questArea"></div>
+    </div>
+
     <!-- SELF RATING -->
     <div class="section">
       <div class="section-title">⭐ <span class="de">Selbsteinschätzung</span><span class="vi">Tự đánh giá kỹ năng</span> <span class="badge"><span class="de">KLICK ZUM BEWERTEN</span><span class="vi">BẤM ĐỂ CHẤM</span></span></div>
@@ -105,12 +115,6 @@
         <span><div class="dot" style="background:var(--ok)"></div><span class="de">Sicher im Alltag</span><span class="vi">Nắm chắc</span></span>
       </div>
       <div id="skillArea"></div>
-    </div>
-
-    <!-- QUESTIONS -->
-    <div class="section">
-      <div class="section-title">💬 <span class="de">Persönliche Fragen</span><span class="vi">Câu hỏi cá nhân</span> <span class="badge"><span class="de">6 PFLICHT + 2 OPTIONAL</span><span class="vi">6 BẮT BUỘC + 2 TÙY CHỌN</span></span></div>
-      <div id="questArea"></div>
     </div>
 
     <button class="submit-btn" id="submitBtn" onclick="submitForm()">🚀 <span class="de">Absenden</span><span class="vi">Gửi</span></button>
@@ -138,12 +142,6 @@ const sbH = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Ty
 
 // Skill data (matching dashboard IDs)
 const CLUSTERS = [
-  { id:'sushi_cold', de:'Sushi & Cold Kitchen', vn:'Sushi & Bếp lạnh', icon:'🍣', color:'#dc2626', skills:[
-    {id:'sushi_reis',de:'Sushi-Reis',vn:'Cơm Sushi'},{id:'messer_schnitt',de:'Messer & Schnitt',vn:'Dao & Cắt'},{id:'nigiri_maki_basics',de:'Nigiri & Maki',vn:'Nigiri & Maki'},{id:'praesentation_abflammen',de:'Präsentation & Abflammen',vn:'Trình bày & Khò'},{id:'fish_knowledge',de:'Fischkunde',vn:'Kiến thức cá'},{id:'creative_rolls',de:'Special Rolls',vn:'Special Rolls'},{id:'seafood_butchery',de:'Seafood Butchery',vn:'Xẻ hải sản'},{id:'sashimi_art',de:'Sashimi Art',vn:'Nghệ thuật Sashimi'}
-  ]},
-  { id:'hot_kitchen', de:'Hot Kitchen', vn:'Bếp nóng', icon:'🔥', color:'#ea580c', skills:[
-    {id:'asiat_zutaten_prep',de:'Mise en Place',vn:'Chuẩn bị'},{id:'reis_beilagen',de:'Reis & Beilagen',vn:'Cơm & Món phụ'},{id:'bon_menu_hot',de:'Bon & Menükenntnis',vn:'Đọc bon & Menu'},{id:'sauberkeit_ordnung',de:'Sauberkeit',vn:'Sạch sẽ'},{id:'tempura_frittieren',de:'Tempura & Frittieren',vn:'Tempura & Chiên'},{id:'haccp_hot_kitchen',de:'HACCP',vn:'HACCP'},{id:'suppen_bruehen',de:'Suppen & Brühen',vn:'Súp & Nước dùng'},{id:'timing_koordination',de:'Timing',vn:'Timing'},{id:'wok_hei',de:'Wok Hei & Teppan',vn:'Wok Hei & Teppan'}
-  ]},
   { id:'service', de:'Service', vn:'Phục vụ', icon:'🛎️', color:'#be185d', skills:[
     {id:'tisch_setup',de:'Tisch-Setup',vn:'Setup bàn'},{id:'serviertechnik',de:'Serviertechnik',vn:'Kỹ thuật phục vụ'},{id:'begruessung',de:'Gästebegrüßung',vn:'Chào đón khách'},{id:'kassieren',de:'Kassieren',vn:'Thu ngân'},{id:'getraenkeservice',de:'Getränkeservice',vn:'Phục vụ đồ uống'},{id:'weinservice',de:'Weinberatung',vn:'Tư vấn rượu vang'},{id:'bestellannahme',de:'Bestellannahme',vn:'Nhận order'},{id:'reklamationsmanagement',de:'Reklamation',vn:'Xử lý khiếu nại'}
   ]},
@@ -153,14 +151,20 @@ const CLUSTERS = [
   { id:'operations', de:'Operations', vn:'Vận hành', icon:'⚙️', color:'#2563eb', skills:[
     {id:'mise_en_place',de:'Bar-Setup',vn:'Chuẩn bị Bar'},{id:'hygiene_bar',de:'Hygiene',vn:'Vệ sinh'},{id:'pos_bar',de:'POS / Kasse',vn:'POS / Thu ngân'},{id:'lagerhaltung',de:'Lagerhaltung (FIFO)',vn:'Quản lý kho (FIFO)'},{id:'speed_workflow',de:'Speed & Workflow',vn:'Tốc độ & Quy trình'}
   ]},
+  { id:'sushi_cold', de:'Sushi & Cold Kitchen', vn:'Sushi & Bếp lạnh', icon:'🍣', color:'#dc2626', skills:[
+    {id:'sushi_reis',de:'Sushi-Reis',vn:'Cơm Sushi'},{id:'messer_schnitt',de:'Messer & Schnitt',vn:'Dao & Cắt'},{id:'nigiri_maki_basics',de:'Nigiri & Maki',vn:'Nigiri & Maki'},{id:'praesentation_abflammen',de:'Präsentation & Abflammen',vn:'Trình bày & Khò'},{id:'fish_knowledge',de:'Fischkunde',vn:'Kiến thức cá'},{id:'creative_rolls',de:'Special Rolls',vn:'Special Rolls'},{id:'seafood_butchery',de:'Seafood Butchery',vn:'Xẻ hải sản'},{id:'sashimi_art',de:'Sashimi Art',vn:'Nghệ thuật Sashimi'}
+  ]},
+  { id:'hot_kitchen', de:'Hot Kitchen', vn:'Bếp nóng', icon:'🔥', color:'#ea580c', skills:[
+    {id:'asiat_zutaten_prep',de:'Mise en Place',vn:'Chuẩn bị'},{id:'reis_beilagen',de:'Reis & Beilagen',vn:'Cơm & Món phụ'},{id:'bon_menu_hot',de:'Bon & Menükenntnis',vn:'Đọc bon & Menu'},{id:'sauberkeit_ordnung',de:'Sauberkeit',vn:'Sạch sẽ'},{id:'tempura_frittieren',de:'Tempura & Frittieren',vn:'Tempura & Chiên'},{id:'haccp_hot_kitchen',de:'HACCP',vn:'HACCP'},{id:'suppen_bruehen',de:'Suppen & Brühen',vn:'Súp & Nước dùng'},{id:'timing_koordination',de:'Timing',vn:'Timing'},{id:'wok_hei',de:'Wok Hei & Teppan',vn:'Wok Hei & Teppan'}
+  ]},
+  { id:'soft', de:'Soft Skills', vn:'Kỹ năng mềm', icon:'🌐', color:'#0d9488', skills:[
+    {id:'gastfreundschaft',de:'Gastfreundschaft',vn:'Hiếu khách'},{id:'zeitmanagement',de:'Zeitmanagement',vn:'Quản lý thời gian'},{id:'teamwork_bar',de:'Teamwork',vn:'Làm việc nhóm'},{id:'englisch_bar',de:'Englisch',vn:'Tiếng Anh'},{id:'kommunikation_bar',de:'Kommunikation',vn:'Giao tiếp'},{id:'stressresistenz',de:'Stressresistenz',vn:'Chịu áp lực'}
+  ]},
   { id:'wirtschaft', de:'Wirtschaftlichkeit', vn:'Kinh tế', icon:'💰', color:'#059669', skills:[
     {id:'inventur_bar',de:'Inventur',vn:'Kiểm kê'},{id:'getraenkekalkulation',de:'Kalkulation',vn:'Tính giá'},{id:'umsatzoptimierung',de:'Upselling',vn:'Upselling'}
   ]},
   { id:'compliance', de:'Compliance', vn:'Pháp lý', icon:'⚖️', color:'#dc2626', skills:[
     {id:'arbeitsschutz_bar',de:'Arbeitsschutz',vn:'An toàn lao động'},{id:'jugendschutz',de:'Jugendschutz',vn:'Bảo vệ thanh thiếu niên'},{id:'haccp_bar',de:'HACCP Bar',vn:'HACCP Bar'}
-  ]},
-  { id:'soft', de:'Soft Skills', vn:'Kỹ năng mềm', icon:'🌐', color:'#0d9488', skills:[
-    {id:'gastfreundschaft',de:'Gastfreundschaft',vn:'Hiếu khách'},{id:'zeitmanagement',de:'Zeitmanagement',vn:'Quản lý thời gian'},{id:'teamwork_bar',de:'Teamwork',vn:'Làm việc nhóm'},{id:'englisch_bar',de:'Englisch',vn:'Tiếng Anh'},{id:'kommunikation_bar',de:'Kommunikation',vn:'Giao tiếp'},{id:'stressresistenz',de:'Stressresistenz',vn:'Chịu áp lực'}
   ]}
 ];
 
@@ -206,9 +210,9 @@ function renderQuestions() {
   const area = document.getElementById('questArea');
   area.innerHTML = QUESTIONS.map((q, i) => `
     <div class="q-card">
-      <div class="q-num">${q.tag} ${!q.req ? '<span style="color:var(--tx2)">(Optional)</span>' : '*'}</div>
+      <div class="q-num">${q.tag} ${q.req ? '<span class="req">*</span>' : '<span style="color:var(--tx2);font-size:9px">(Optional)</span>'}</div>
       <div class="q-text"><span class="de">${q.de}</span><span class="vi">${q.vn}</span></div>
-      <textarea id="${q.id}" rows="3" placeholder="${lang === 'de' ? 'Deine Antwort...' : 'Câu trả lời của bạn...'}"></textarea>
+      <textarea id="${q.id}" rows="3" placeholder="${lang === 'de' ? 'Schreibe hier deine Antwort...' : 'Viết câu trả lời ở đây...'}"></textarea>
     </div>`).join('');
 }
 
