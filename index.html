@@ -481,7 +481,7 @@
         const body = encodeURIComponent(lang === 'de'
           ? `Hallo ${b.name.split(' ')[0]},\n\nvielen Dank für deine Bewerbung bei uns! Wir haben dein Profil angesehen und möchten dich gerne persönlich kennenlernen.\n\nBitte buche dir hier einen Termin für ein kurzes Vorstellungsgespräch:\n${CAL_LINK}\n\nWir freuen uns auf dich!\n\nViele Grüße\nDein Team`
           : `Chào ${b.name.split(' ')[0]},\n\nCảm ơn bạn đã gửi hồ sơ cho chúng tôi! Chúng tôi đã xem qua và muốn gặp bạn trực tiếp.\n\nVui lòng chọn lịch hẹn phỏng vấn tại đây:\n${CAL_LINK}\n\nRất mong được gặp bạn!\n\nThân,\nĐội ngũ quản lý`);
-        window.open(`mailto:${b.email || ''}?subject=${subj}&body=${body}`, '_blank');
+        const a = document.createElement('a'); a.href = `mailto:${b.email || ''}?subject=${subj}&body=${body}`; a.click();
         setStatus(b.id, 'accepted');
       }
 
@@ -490,7 +490,7 @@
         const body = encodeURIComponent(lang === 'de'
           ? `Hallo ${b.name.split(' ')[0]},\n\nvielen Dank, dass du dir die Zeit genommen hast, dich bei uns zu bewerben. Wir haben dein Profil sorgfältig geprüft.\n\nLeider passt es zum jetzigen Zeitpunkt nicht ganz zu dem, was wir aktuell suchen. Das heißt aber nicht, dass sich das nicht ändern kann!\n\nWir würden uns freuen, wenn du dich in ein paar Monaten nochmal bei uns meldest – vielleicht ergibt sich dann eine passende Möglichkeit.\n\nAlles Gute und bis hoffentlich bald!\n\nViele Grüße\nDein Team`
           : `Chào ${b.name.split(' ')[0]},\n\nCảm ơn bạn đã dành thời gian ứng tuyển. Chúng tôi đã xem xét hồ sơ của bạn rất kỹ.\n\nTuy nhiên, ở thời điểm hiện tại, vị trí chưa thật sự phù hợp. Nhưng điều đó không có nghĩa là cơ hội đã khép lại!\n\nChúng tôi rất vui nếu bạn liên hệ lại sau vài tháng – biết đâu lúc đó sẽ có vị trí phù hợp cho bạn.\n\nChúc bạn mọi điều tốt đẹp và hẹn gặp lại!\n\nThân,\nĐội ngũ quản lý`);
-        window.open(`mailto:${b.email || ''}?subject=${subj}&body=${body}`, '_blank');
+        const a = document.createElement('a'); a.href = `mailto:${b.email || ''}?subject=${subj}&body=${body}`; a.click();
         setStatus(b.id, 'rejected');
       }
 
