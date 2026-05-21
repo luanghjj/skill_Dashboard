@@ -477,20 +477,24 @@
       }
 
       function mailAccept(b) {
-        const subj = encodeURIComponent(lang === 'de' ? `Einladung zum Vorstellungsgespräch – ${b.name}` : `Lời mời phỏng vấn – ${b.name}`);
-        const body = encodeURIComponent(lang === 'de'
-          ? `Hallo ${b.name.split(' ')[0]},\n\nvielen Dank für deine Bewerbung bei uns! Wir haben dein Profil angesehen und möchten dich gerne persönlich kennenlernen.\n\nBitte buche dir hier einen Termin für ein kurzes Vorstellungsgespräch:\n${CAL_LINK}\n\nWir freuen uns auf dich!\n\nViele Grüße\nDein Team`
-          : `Chào ${b.name.split(' ')[0]},\n\nCảm ơn bạn đã gửi hồ sơ cho chúng tôi! Chúng tôi đã xem qua và muốn gặp bạn trực tiếp.\n\nVui lòng chọn lịch hẹn phỏng vấn tại đây:\n${CAL_LINK}\n\nRất mong được gặp bạn!\n\nThân,\nĐội ngũ quản lý`);
-        const a = document.createElement('a'); a.href = `mailto:${b.email || ''}?subject=${subj}&body=${body}`; a.click();
+        const to = b.email || '';
+        const s = encodeURIComponent(lang === 'de' ? 'Einladung zum Vorstellungsgespräch' : 'Lời mời phỏng vấn');
+        const n = String.fromCharCode(10);
+        const msg = lang === 'de'
+          ? 'Hallo ' + b.name.split(' ')[0] + ',' + n + n + 'vielen Dank für deine Bewerbung! Wir möchten dich gerne persönlich kennenlernen.' + n + n + 'Bitte buche dir hier einen Termin:' + n + CAL_LINK + n + n + 'Wir freuen uns auf dich!' + n + n + 'Viele Grüße' + n + 'Dein Team'
+          : 'Chào ' + b.name.split(' ')[0] + ',' + n + n + 'Cảm ơn bạn đã gửi hồ sơ! Chúng tôi muốn gặp bạn.' + n + n + 'Chọn lịch hẹn phỏng vấn tại đây:' + n + CAL_LINK + n + n + 'Rất mong được gặp bạn!' + n + n + 'Thân,' + n + 'Đội ngũ quản lý';
+        window.location.href = 'mailto:' + to + '?subject=' + s + '&body=' + encodeURIComponent(msg);
         setStatus(b.id, 'accepted');
       }
 
       function mailReject(b) {
-        const subj = encodeURIComponent(lang === 'de' ? `Deine Bewerbung – ${b.name}` : `Hồ sơ của bạn – ${b.name}`);
-        const body = encodeURIComponent(lang === 'de'
-          ? `Hallo ${b.name.split(' ')[0]},\n\nvielen Dank, dass du dir die Zeit genommen hast, dich bei uns zu bewerben. Wir haben dein Profil sorgfältig geprüft.\n\nLeider passt es zum jetzigen Zeitpunkt nicht ganz zu dem, was wir aktuell suchen. Das heißt aber nicht, dass sich das nicht ändern kann!\n\nWir würden uns freuen, wenn du dich in ein paar Monaten nochmal bei uns meldest – vielleicht ergibt sich dann eine passende Möglichkeit.\n\nAlles Gute und bis hoffentlich bald!\n\nViele Grüße\nDein Team`
-          : `Chào ${b.name.split(' ')[0]},\n\nCảm ơn bạn đã dành thời gian ứng tuyển. Chúng tôi đã xem xét hồ sơ của bạn rất kỹ.\n\nTuy nhiên, ở thời điểm hiện tại, vị trí chưa thật sự phù hợp. Nhưng điều đó không có nghĩa là cơ hội đã khép lại!\n\nChúng tôi rất vui nếu bạn liên hệ lại sau vài tháng – biết đâu lúc đó sẽ có vị trí phù hợp cho bạn.\n\nChúc bạn mọi điều tốt đẹp và hẹn gặp lại!\n\nThân,\nĐội ngũ quản lý`);
-        const a = document.createElement('a'); a.href = `mailto:${b.email || ''}?subject=${subj}&body=${body}`; a.click();
+        const to = b.email || '';
+        const s = encodeURIComponent(lang === 'de' ? 'Deine Bewerbung' : 'Hồ sơ của bạn');
+        const n = String.fromCharCode(10);
+        const msg = lang === 'de'
+          ? 'Hallo ' + b.name.split(' ')[0] + ',' + n + n + 'vielen Dank für deine Bewerbung. Leider passt es aktuell nicht ganz.' + n + n + 'Melde dich gerne in ein paar Monaten nochmal bei uns!' + n + n + 'Alles Gute!' + n + n + 'Viele Grüße' + n + 'Dein Team'
+          : 'Chào ' + b.name.split(' ')[0] + ',' + n + n + 'Cảm ơn bạn. Hiện tại vị trí chưa phù hợp.' + n + n + 'Hãy liên hệ lại sau vài tháng nhé!' + n + n + 'Chúc bạn mọi điều tốt đẹp!' + n + n + 'Thân,' + n + 'Đội ngũ quản lý';
+        window.location.href = 'mailto:' + to + '?subject=' + s + '&body=' + encodeURIComponent(msg);
         setStatus(b.id, 'rejected');
       }
 
