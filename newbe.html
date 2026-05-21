@@ -103,6 +103,31 @@
           <select id="fpos"><option value="Service">🛎️ Service / Chạy bàn</option><option value="Küche">🍳 Küche / Bếp</option><option value="Bar">🍸 Bar</option><option value="Sushi">🍣 Sushi</option><option value="Allrounder">⭐ Allrounder / Linh hoạt</option></select>
         </div>
       </div>
+
+      <!-- SPRACHEN -->
+      <div class="card" style="margin-top:-4px">
+        <div style="font-size:11px;font-weight:700;color:var(--tx2);margin-bottom:10px;letter-spacing:.5px">🌐 <span class="de">Sprachkenntnisse</span><span class="vi">Trình độ ngôn ngữ</span></div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap">
+          <div class="field" style="flex:1;min-width:140px"><label><span class="de">Deutsch *</span><span class="vi">Tiếng Đức *</span></label>
+            <select id="flang_de">
+              <option value="">—</option>
+              <option value="A1">A1 – Anfänger / Sơ cấp</option>
+              <option value="A2">A2 – Grundlagen / Cơ bản</option>
+              <option value="B1">B1 – Mittelstufe / Trung cấp</option>
+              <option value="B2">B2 – Gutes Mittel / Khá</option>
+              <option value="C1">C1 – Fortgeschritten / Nâng cao</option>
+              <option value="C2">C2 – Muttersprachlich / Bản ngữ</option>
+            </select>
+          </div>
+          <div class="field" style="flex:1;min-width:140px"><label><span class="de">Englisch</span><span class="vi">Tiếng Anh</span></label>
+            <select id="flang_en">
+              <option value="">—</option>
+              <option value="A1">A1</option><option value="A2">A2</option><option value="B1">B1</option><option value="B2">B2</option><option value="C1">C1</option><option value="C2">C2</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><label><span class="de">Weitere Sprachen</span><span class="vi">Ngôn ngữ khác</span></label><input id="flang_other" placeholder="z.B. Vietnamesisch (Muttersprache), Japanisch (A2) …"></div>
+      </div>
     </div>
 
     <!-- QUESTIONS -->
@@ -257,6 +282,7 @@ async function submitForm() {
     phone: document.getElementById('fphone').value.trim(),
     email: document.getElementById('femail').value.trim(),
     position: document.getElementById('fpos').value,
+    languages: { deutsch: document.getElementById('flang_de').value, englisch: document.getElementById('flang_en').value, other: document.getElementById('flang_other').value.trim() },
     selfRatings: { ...ratings },
     answers: answers,
     lang: lang,
