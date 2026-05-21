@@ -494,6 +494,12 @@
         setStatus(b.id, 'rejected');
       }
 
+      async function deleteEntry(id) {
+        if (!confirm(lang === 'de' ? 'Bewerbung wirklich löschen?' : 'Xoá hồ sơ này?')) return;
+        try { await fetch(`${SB_URL}/rest/v1/sd_files?id=eq.${id}`, { method: 'DELETE', headers: sbHeaders }); } catch(e) { console.error(e); }
+        setBew(bew.filter(b => b.id !== id)); setBSel(null);
+      }
+
       const ST = { accepted: { l: lang === 'de' ? '✅ Eingeladen' : '✅ Đã mời', c: '#059669', bg: 'rgba(5,150,105,.1)' }, rejected: { l: lang === 'de' ? '❌ Abgelehnt' : '❌ Đã từ chối', c: '#ef4444', bg: 'rgba(239,68,68,.1)' } };
 
       return <div className="dark-card" style={{ background: dark ? "#1e293b" : "#fff", borderRadius: 12, border: "1px solid var(--bd)", overflow: "hidden" }}>
@@ -528,6 +534,7 @@
               <button onClick={() => mailAccept(b)} style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "none", fontSize: 12, fontWeight: 700, cursor: "pointer", background: "linear-gradient(135deg,#059669,#10b981)", color: "#fff", boxShadow: "0 2px 8px rgba(5,150,105,.3)" }}>✅ {lang === "de" ? "Einladen & Mail senden" : "Mời & Gửi mail"}</button>
               <button onClick={() => mailReject(b)} style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1px solid rgba(239,68,68,.3)", fontSize: 12, fontWeight: 700, cursor: "pointer", background: dark ? "rgba(239,68,68,.08)" : "rgba(239,68,68,.05)", color: "#ef4444" }}>❌ {lang === "de" ? "Absagen & Mail senden" : "Từ chối & Gửi mail"}</button>
             </div>
+            <button onClick={() => deleteEntry(b.id)} style={{ marginTop: 8, padding: "6px 12px", borderRadius: 8, border: "1px solid rgba(239,68,68,.2)", fontSize: 10, fontWeight: 600, cursor: "pointer", background: "transparent", color: "#ef4444", opacity: .6 }}>🗑 {lang === "de" ? "Löschen" : "Xoá"}</button>
           </div>}
         </div>)}
       </div>;
