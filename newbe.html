@@ -212,7 +212,7 @@ function renderQuestions() {
     <div class="q-card">
       <div class="q-num">${q.tag} ${q.req ? '<span class="req">*</span>' : '<span style="color:var(--tx2);font-size:9px">(Optional)</span>'}</div>
       <div class="q-text"><span class="de">${q.de}</span><span class="vi">${q.vn}</span></div>
-      <textarea id="${q.id}" rows="3" placeholder="${lang === 'de' ? 'Schreibe hier deine Antwort...' : 'Viết câu trả lời ở đây...'}"></textarea>
+      <textarea id="${q.id}" rows="3" placeholder="${lang === 'de' ? '2–4 Sätze reichen …' : '2–4 câu là đủ …'}"></textarea>
     </div>`).join('');
 }
 
