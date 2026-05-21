@@ -1,6 +1,11 @@
 [build]
   publish = "."
 
+[[redirects]]
+  from = "/newbe"
+  to = "/newbe.html"
+  status = 200
+
 [[headers]]
   for = "/*"
   [headers.values]

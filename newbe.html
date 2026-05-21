@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill Self-Assessment – Newbie</title>
+<style>
+  :root { --ac:#2563eb; --ac2:#7c3aed; --bg:#0f172a; --bg2:#1e293b; --bg3:#334155; --tx:#e2e8f0; --tx2:#94a3b8; --bd:#475569; --ok:#059669; --warn:#f59e0b; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);font-family:-apple-system,'Segoe UI',sans-serif;color:var(--tx);min-height:100vh}
+  body.lang-vi .de{display:none!important} body.lang-de .vi{display:none!important}
+
+  .header{background:linear-gradient(135deg,#0f172a,#1e293b);padding:32px 20px 24px;text-align:center;position:relative;border-bottom:1px solid var(--bd)}
+  .header::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 120%,rgba(37,99,235,.15),transparent 70%)}
+  .header h1{font-size:clamp(20px,4vw,32px);font-weight:800;color:#fff;position:relative;margin-bottom:4px}
+  .header h1 em{color:#818cf8;font-style:normal}
+  .header p{color:rgba(255,255,255,.4);font-size:11px;letter-spacing:2px;position:relative}
+  .lang-bar{display:flex;justify-content:center;gap:6px;margin-top:12px;position:relative}
+  .lang-btn{padding:5px 18px;border-radius:16px;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.5);font-size:12px;font-weight:600;cursor:pointer;transition:all .2s}
+  .lang-btn.active{background:var(--ac);border-color:var(--ac);color:#fff}
+
+  .container{max-width:720px;margin:0 auto;padding:20px 16px 60px}
+  .section{margin-bottom:24px}
+  .section-title{font-size:14px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px;color:var(--tx)}
+  .section-title .badge{font-size:9px;padding:2px 8px;border-radius:10px;background:rgba(37,99,235,.1);color:var(--ac);font-weight:700;letter-spacing:1px}
+
+  .card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:16px;margin-bottom:12px}
+  .field{margin-bottom:14px}
+  .field label{display:block;font-size:11px;font-weight:600;color:var(--tx2);margin-bottom:4px;letter-spacing:.5px}
+  .field input,.field select,.field textarea{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--bd);background:var(--bg3);color:var(--tx);font-size:13px;font-family:inherit;outline:none;transition:border .2s}
+  .field input:focus,.field select:focus,.field textarea:focus{border-color:var(--ac)}
+  .field textarea{resize:vertical;min-height:80px}
+
+  .cluster{margin-bottom:16px}
+  .cluster-head{display:flex;align-items:center;gap:8px;padding:8px 12px;background:var(--bg3);border-radius:8px;cursor:pointer;user-select:none;margin-bottom:8px;transition:background .2s}
+  .cluster-head:hover{background:#3b4f6a}
+  .cluster-icon{font-size:16px}
+  .cluster-name{flex:1;font-size:12px;font-weight:700}
+  .cluster-toggle{font-size:10px;color:var(--tx2);transition:transform .2s}
+  .cluster.open .cluster-toggle{transform:rotate(180deg)}
+  .cluster-body{display:none;padding:0 4px}
+  .cluster.open .cluster-body{display:block}
+
+  .skill-row{display:flex;align-items:center;gap:8px;padding:6px 8px;border-bottom:1px solid rgba(255,255,255,.04);font-size:12px}
+  .skill-row:last-child{border-bottom:none}
+  .skill-name{flex:1;line-height:1.3}
+  .rating-btns{display:flex;gap:4px;flex-shrink:0}
+  .r-btn{width:28px;height:28px;border-radius:50%;border:2px solid var(--bd);background:transparent;cursor:pointer;font-size:10px;font-weight:700;transition:all .15s;display:flex;align-items:center;justify-content:center;color:var(--tx2)}
+  .r-btn:hover{border-color:var(--tx)}
+  .r-btn.sel-0{border-color:#64748b;background:#64748b;color:#fff}
+  .r-btn.sel-1{border-color:var(--warn);background:var(--warn);color:#fff}
+  .r-btn.sel-2{border-color:var(--ok);background:var(--ok);color:#fff}
+  .r-legend{display:flex;gap:12px;justify-content:center;padding:8px 0;margin-bottom:12px;flex-wrap:wrap}
+  .r-legend span{font-size:10px;display:flex;align-items:center;gap:4px;color:var(--tx2)}
+  .r-legend .dot{width:10px;height:10px;border-radius:50%}
+
+  .q-card{background:var(--bg2);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;margin-bottom:10px}
+  .q-num{font-size:9px;font-weight:700;color:var(--ac);letter-spacing:1px;margin-bottom:4px}
+  .q-text{font-size:13px;font-weight:600;margin-bottom:8px;line-height:1.4}
+
+  .submit-btn{width:100%;padding:16px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--ac),var(--ac2));color:#fff;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 24px rgba(37,99,235,.3);transition:transform .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+  .submit-btn:hover{transform:scale(1.02)}
+  .submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+  .thanks{display:none;text-align:center;padding:80px 20px}
+  .thanks.show{display:block}
+  .thanks h2{font-size:28px;font-weight:800;margin-bottom:8px}
+  .thanks p{color:var(--tx2);font-size:14px}
+  .form-wrap.hide{display:none}
+
+  @media(max-width:500px){.skill-row{flex-wrap:wrap;gap:4px}.skill-name{width:100%}.rating-btns{margin-left:auto}}
+</style>
+</head>
+<body class="lang-de">
+
+<div class="header">
+  <h1><span class="de">Über <em>dich</em></span><span class="vi">Về <em>bạn</em></span></h1>
+  <p><span class="de">KURZ IN EIGENEN WORTEN · SELF-ASSESSMENT</span><span class="vi">VÀI DÒNG BẰNG LỜI CỦA BẠN · TỰ ĐÁNH GIÁ</span></p>
+  <div class="lang-bar">
+    <button class="lang-btn active" onclick="setLang('de')">🇩🇪 Deutsch</button>
+    <button class="lang-btn" onclick="setLang('vi')">🇻🇳 Tiếng Việt</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="form-wrap" id="formWrap">
+
+    <!-- INFO -->
+    <div class="section">
+      <div class="section-title">📝 <span class="de">Persönliche Angaben</span><span class="vi">Thông tin cá nhân</span></div>
+      <div class="card">
+        <div class="field"><label><span class="de">Dein Name *</span><span class="vi">Tên của bạn *</span></label><input id="fname" required placeholder="z.B. Nguyen Van A"></div>
+        <div class="field"><label><span class="de">Gewünschte Position</span><span class="vi">Vị trí ứng tuyển</span></label>
+          <select id="fpos"><option value="Service">🛎️ Service</option><option value="Küche">🍳 Küche / Bếp</option><option value="Bar">🍸 Bar</option><option value="Sushi">🍣 Sushi</option><option value="Allrounder">⭐ Allrounder</option></select>
+        </div>
+      </div>
+    </div>
+
+    <!-- SELF RATING -->
+    <div class="section">
+      <div class="section-title">⭐ <span class="de">Selbsteinschätzung</span><span class="vi">Tự đánh giá kỹ năng</span> <span class="badge"><span class="de">KLICK ZUM BEWERTEN</span><span class="vi">BẤM ĐỂ CHẤM</span></span></div>
+      <div class="r-legend">
+        <span><div class="dot" style="background:#64748b"></div><span class="de">Keine Kenntnis</span><span class="vi">Không biết</span></span>
+        <span><div class="dot" style="background:var(--warn)"></div><span class="de">Grundkenntnisse</span><span class="vi">Biết cơ bản</span></span>
+        <span><div class="dot" style="background:var(--ok)"></div><span class="de">Sicher im Alltag</span><span class="vi">Nắm chắc</span></span>
+      </div>
+      <div id="skillArea"></div>
+    </div>
+
+    <!-- QUESTIONS -->
+    <div class="section">
+      <div class="section-title">💬 <span class="de">Persönliche Fragen</span><span class="vi">Câu hỏi cá nhân</span> <span class="badge"><span class="de">6 PFLICHT + 2 OPTIONAL</span><span class="vi">6 BẮT BUỘC + 2 TÙY CHỌN</span></span></div>
+      <div id="questArea"></div>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="submitForm()">🚀 <span class="de">Absenden</span><span class="vi">Gửi</span></button>
+  </div>
+
+  <div class="thanks" id="thanks">
+    <div style="font-size:64px;margin-bottom:16px">🎉</div>
+    <h2><span class="de">Vielen Dank!</span><span class="vi">Cảm ơn bạn!</span></h2>
+    <p><span class="de">Deine Antworten wurden gespeichert. Wir melden uns bald bei dir!</span><span class="vi">Câu trả lời đã được lưu. Chúng tôi sẽ liên hệ bạn sớm!</span></p>
+  </div>
+</div>
+
+<script>
+let lang = 'de';
+function setLang(l) {
+  lang = l; document.body.className = 'lang-' + l;
+  document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.lang-btn').forEach(b => { if (b.getAttribute('onclick').includes("'" + l + "'")) b.classList.add('active'); });
+}
+
+// Supabase
+const SB_URL = 'https://bjhdiiimrhvgnegvcpci.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJqaGRpaWltcmh2Z25lZ3ZjcGNpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUxMTkzNTEsImV4cCI6MjA5MDY5NTM1MX0.xtra1oFgbM0a6rT6eOEaPO0_j0mpZnyGKYFFbPkK9nc';
+const sbH = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' };
+
+// Skill data (matching dashboard IDs)
+const CLUSTERS = [
+  { id:'sushi_cold', de:'Sushi & Cold Kitchen', vn:'Sushi & Bếp lạnh', icon:'🍣', color:'#dc2626', skills:[
+    {id:'sushi_reis',de:'Sushi-Reis',vn:'Cơm Sushi'},{id:'messer_schnitt',de:'Messer & Schnitt',vn:'Dao & Cắt'},{id:'nigiri_maki_basics',de:'Nigiri & Maki',vn:'Nigiri & Maki'},{id:'praesentation_abflammen',de:'Präsentation & Abflammen',vn:'Trình bày & Khò'},{id:'fish_knowledge',de:'Fischkunde',vn:'Kiến thức cá'},{id:'creative_rolls',de:'Special Rolls',vn:'Special Rolls'},{id:'seafood_butchery',de:'Seafood Butchery',vn:'Xẻ hải sản'},{id:'sashimi_art',de:'Sashimi Art',vn:'Nghệ thuật Sashimi'}
+  ]},
+  { id:'hot_kitchen', de:'Hot Kitchen', vn:'Bếp nóng', icon:'🔥', color:'#ea580c', skills:[
+    {id:'asiat_zutaten_prep',de:'Mise en Place',vn:'Chuẩn bị'},{id:'reis_beilagen',de:'Reis & Beilagen',vn:'Cơm & Món phụ'},{id:'bon_menu_hot',de:'Bon & Menükenntnis',vn:'Đọc bon & Menu'},{id:'sauberkeit_ordnung',de:'Sauberkeit',vn:'Sạch sẽ'},{id:'tempura_frittieren',de:'Tempura & Frittieren',vn:'Tempura & Chiên'},{id:'haccp_hot_kitchen',de:'HACCP',vn:'HACCP'},{id:'suppen_bruehen',de:'Suppen & Brühen',vn:'Súp & Nước dùng'},{id:'timing_koordination',de:'Timing',vn:'Timing'},{id:'wok_hei',de:'Wok Hei & Teppan',vn:'Wok Hei & Teppan'}
+  ]},
+  { id:'service', de:'Service', vn:'Phục vụ', icon:'🛎️', color:'#be185d', skills:[
+    {id:'tisch_setup',de:'Tisch-Setup',vn:'Setup bàn'},{id:'serviertechnik',de:'Serviertechnik',vn:'Kỹ thuật phục vụ'},{id:'begruessung',de:'Gästebegrüßung',vn:'Chào đón khách'},{id:'kassieren',de:'Kassieren',vn:'Thu ngân'},{id:'getraenkeservice',de:'Getränkeservice',vn:'Phục vụ đồ uống'},{id:'weinservice',de:'Weinberatung',vn:'Tư vấn rượu vang'},{id:'bestellannahme',de:'Bestellannahme',vn:'Nhận order'},{id:'reklamationsmanagement',de:'Reklamation',vn:'Xử lý khiếu nại'}
+  ]},
+  { id:'bar', de:'Bar & Getränke', vn:'Bar & Đồ uống', icon:'🍸', color:'#d97706', skills:[
+    {id:'eis_temperatur',de:'Eis & Temperatur',vn:'Đá & Nhiệt độ'},{id:'kaffee_bar',de:'Kaffee',vn:'Cà phê'},{id:'mocktails',de:'Mocktails',vn:'Mocktails'},{id:'bierkunde',de:'Bierkunde',vn:'Kiến thức bia'},{id:'bartechniken',de:'Bartechniken',vn:'Kỹ thuật Bartender'},{id:'cocktail_klassiker',de:'Cocktail-Klassiker',vn:'Cocktail kinh điển'},{id:'spirituosenkunde',de:'Spirituosen',vn:'Rượu mạnh'},{id:'weinkunde',de:'Weinkunde',vn:'Rượu vang'}
+  ]},
+  { id:'operations', de:'Operations', vn:'Vận hành', icon:'⚙️', color:'#2563eb', skills:[
+    {id:'mise_en_place',de:'Bar-Setup',vn:'Chuẩn bị Bar'},{id:'hygiene_bar',de:'Hygiene',vn:'Vệ sinh'},{id:'pos_bar',de:'POS / Kasse',vn:'POS / Thu ngân'},{id:'lagerhaltung',de:'Lagerhaltung (FIFO)',vn:'Quản lý kho (FIFO)'},{id:'speed_workflow',de:'Speed & Workflow',vn:'Tốc độ & Quy trình'}
+  ]},
+  { id:'wirtschaft', de:'Wirtschaftlichkeit', vn:'Kinh tế', icon:'💰', color:'#059669', skills:[
+    {id:'inventur_bar',de:'Inventur',vn:'Kiểm kê'},{id:'getraenkekalkulation',de:'Kalkulation',vn:'Tính giá'},{id:'umsatzoptimierung',de:'Upselling',vn:'Upselling'}
+  ]},
+  { id:'compliance', de:'Compliance', vn:'Pháp lý', icon:'⚖️', color:'#dc2626', skills:[
+    {id:'arbeitsschutz_bar',de:'Arbeitsschutz',vn:'An toàn lao động'},{id:'jugendschutz',de:'Jugendschutz',vn:'Bảo vệ thanh thiếu niên'},{id:'haccp_bar',de:'HACCP Bar',vn:'HACCP Bar'}
+  ]},
+  { id:'soft', de:'Soft Skills', vn:'Kỹ năng mềm', icon:'🌐', color:'#0d9488', skills:[
+    {id:'gastfreundschaft',de:'Gastfreundschaft',vn:'Hiếu khách'},{id:'zeitmanagement',de:'Zeitmanagement',vn:'Quản lý thời gian'},{id:'teamwork_bar',de:'Teamwork',vn:'Làm việc nhóm'},{id:'englisch_bar',de:'Englisch',vn:'Tiếng Anh'},{id:'kommunikation_bar',de:'Kommunikation',vn:'Giao tiếp'},{id:'stressresistenz',de:'Stressresistenz',vn:'Chịu áp lực'}
+  ]}
+];
+
+const QUESTIONS = [
+  { id:'q1', req:true, tag:'🔥 Leidenschaft', de:'Was machst du in der Gastronomie am liebsten – und warum?', vn:'Trong ngành nhà hàng, bạn thích làm công việc gì nhất – và vì sao?' },
+  { id:'q2', req:true, tag:'🪞 Selbstkenntnis', de:'Welche Aufgabe oder Station magst du am wenigsten – und warum?', vn:'Công việc hoặc vị trí nào bạn ít thích nhất – và vì sao?' },
+  { id:'q3', req:true, tag:'⚡ Stress & Praxis', de:'Beschreibe eine Situation, in der im Service oder in der Küche richtig viel los war. Wie bist du damit umgegangen?', vn:'Hãy kể về một lần khi nhà hàng hoặc bếp rất đông khách và áp lực cao. Bạn đã xử lý tình huống đó như thế nào?' },
+  { id:'q4', req:true, tag:'🤝 Erwartungen', de:'Was erwartest du von uns als Arbeitgeber?', vn:'Bạn mong đợi điều gì từ chúng tôi với tư cách là nơi làm việc?' },
+  { id:'q5', req:true, tag:'📈 Entwicklung', de:'Wo möchtest du dich in den nächsten 12 Monaten weiterentwickeln?', vn:'Trong 12 tháng tới, bạn muốn phát triển bản thân ở lĩnh vực nào?' },
+  { id:'q6', req:true, tag:'✨ Persönliches Plus', de:'Was sollten wir über dich wissen, was nicht im Lebenslauf steht?', vn:'Có điều gì về bạn mà CV không nói đến, nhưng bạn muốn chúng tôi biết?' },
+  { id:'q7', req:false, tag:'🌐 Sprache', de:'In welcher Sprache fühlst du dich im Gästekontakt am wohlsten?', vn:'Bạn cảm thấy thoải mái nhất khi giao tiếp với khách bằng ngôn ngữ nào?' },
+  { id:'q8', req:false, tag:'📅 Verfügbarkeit', de:'Wie schnell kannst du frühestens anfangen, und welche Schichten passen am besten zu dir (Mittag, Abend, Wochenende)?', vn:'Bạn có thể bắt đầu làm việc sớm nhất khi nào, và ca nào phù hợp với bạn nhất (trưa, tối, cuối tuần)?' }
+];
+
+// State
+const ratings = {};
+
+// Render skills
+function renderSkills() {
+  const area = document.getElementById('skillArea');
+  area.innerHTML = CLUSTERS.map(cl => `
+    <div class="cluster open" id="cl_${cl.id}">
+      <div class="cluster-head" onclick="this.parentElement.classList.toggle('open')" style="border-left:3px solid ${cl.color}">
+        <span class="cluster-icon">${cl.icon}</span>
+        <span class="cluster-name"><span class="de">${cl.de}</span><span class="vi">${cl.vn}</span></span>
+        <span class="cluster-toggle">▼</span>
+      </div>
+      <div class="cluster-body">${cl.skills.map(s => `
+        <div class="skill-row">
+          <span class="skill-name"><span class="de">${s.de}</span><span class="vi">${s.vn}</span></span>
+          <div class="rating-btns">
+            <button class="r-btn" data-sid="${s.id}" data-val="0" onclick="rate('${s.id}',0,this)" title="Keine Kenntnis / Không biết">✕</button>
+            <button class="r-btn" data-sid="${s.id}" data-val="1" onclick="rate('${s.id}',1,this)" title="Grundkenntnisse / Biết cơ bản">●</button>
+            <button class="r-btn" data-sid="${s.id}" data-val="2" onclick="rate('${s.id}',2,this)" title="Sicher / Nắm chắc">★</button>
+          </div>
+        </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+// Render questions
+function renderQuestions() {
+  const area = document.getElementById('questArea');
+  area.innerHTML = QUESTIONS.map((q, i) => `
+    <div class="q-card">
+      <div class="q-num">${q.tag} ${!q.req ? '<span style="color:var(--tx2)">(Optional)</span>' : '*'}</div>
+      <div class="q-text"><span class="de">${q.de}</span><span class="vi">${q.vn}</span></div>
+      <textarea id="${q.id}" rows="3" placeholder="${lang === 'de' ? 'Deine Antwort...' : 'Câu trả lời của bạn...'}"></textarea>
+    </div>`).join('');
+}
+
+function rate(sid, val, btn) {
+  ratings[sid] = val;
+  const row = btn.closest('.skill-row');
+  row.querySelectorAll('.r-btn').forEach(b => { b.className = 'r-btn'; });
+  btn.classList.add('sel-' + val);
+}
+
+async function submitForm() {
+  const name = document.getElementById('fname').value.trim();
+  if (!name) { alert(lang === 'de' ? 'Bitte Name eingeben' : 'Vui lòng nhập tên'); return; }
+  // Check required questions
+  for (const q of QUESTIONS.filter(q => q.req)) {
+    if (!document.getElementById(q.id).value.trim()) {
+      alert((lang === 'de' ? 'Bitte Pflichtfrage beantworten: ' : 'Vui lòng trả lời câu bắt buộc: ') + q.tag);
+      document.getElementById(q.id).focus();
+      return;
+    }
+  }
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '⏳ ...';
+
+  const answers = {};
+  QUESTIONS.forEach(q => { answers[q.id] = document.getElementById(q.id).value.trim(); });
+
+  const data = {
+    id: 'nb_' + Date.now(),
+    type: 'newbe_form',
+    name: name,
+    position: document.getElementById('fpos').value,
+    selfRatings: { ...ratings },
+    answers: answers,
+    lang: lang,
+    submittedAt: new Date().toISOString()
+  };
+
+  try {
+    await fetch(SB_URL + '/rest/v1/sd_files', {
+      method: 'POST',
+      headers: { ...sbH, 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+      body: JSON.stringify({ id: data.id, data: data, updated_at: new Date().toISOString() })
+    });
+  } catch(e) { console.error(e); }
+
+  document.getElementById('formWrap').classList.add('hide');
+  document.getElementById('thanks').classList.add('show');
+}
+
+renderSkills();
+renderQuestions();
+</script>
+</body>
+</html>
