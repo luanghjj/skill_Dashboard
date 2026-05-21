@@ -463,6 +463,27 @@
 
 
     /* ═══════════════════ MAIN APP ═══════════════════ */
+    function BewerbungenTab({ dark, lang }) {
+      const [bew, setBew] = React.useState([]);
+      const [bSel, setBSel] = React.useState(null);
+      React.useEffect(() => { (async () => { try { const r = await fetch(`${SB_URL}/rest/v1/sd_files?select=*`, { headers: sbHeaders }); const rows = await r.json(); if (Array.isArray(rows)) setBew(rows.filter(r => r.data?.type === 'newbe_form').map(r => r.data).sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt))); } catch(e) { console.error(e); } })(); }, []);
+      return <div className="dark-card" style={{ background: dark ? "#1e293b" : "#fff", borderRadius: 12, border: "1px solid var(--bd)", overflow: "hidden" }}>
+        <div style={{ padding: "12px 18px", borderBottom: "1px solid var(--bd)", fontWeight: 700, fontSize: 14 }}>📋 {lang === "de" ? "Newbe-Bewerbungen" : "Hồ sơ Newbe"} <span style={{ fontSize: 10, color: "var(--tx2)", fontWeight: 500 }}>({bew.length})</span></div>
+        {bew.length === 0 && <div style={{ padding: 24, textAlign: "center", color: "var(--tx2)", fontSize: 12 }}>{lang === "de" ? "Noch keine Bewerbungen" : "Chưa có hồ sơ nào"}</div>}
+        {bew.map(b => <div key={b.id} onClick={() => setBSel(bSel === b.id ? null : b.id)} style={{ padding: "10px 18px", borderBottom: "1px solid var(--bd)", cursor: "pointer", background: bSel === b.id ? (dark ? "rgba(37,99,235,.06)" : "rgba(37,99,235,.03)") : "transparent" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div><span style={{ fontWeight: 700, fontSize: 13 }}>{b.name}</span> <span style={{ fontSize: 10, color: "var(--ac)", background: "rgba(37,99,235,.08)", padding: "1px 6px", borderRadius: 6, fontWeight: 600 }}>{b.position}</span></div>
+            <span style={{ fontSize: 9, color: "var(--tx2)" }}>{new Date(b.submittedAt).toLocaleDateString()}</span>
+          </div>
+          {bSel === b.id && <div style={{ marginTop: 10 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tx2)", marginBottom: 6 }}>⭐ {lang === "de" ? "Selbsteinschätzung" : "Tự đánh giá"}</div>
+            <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 12 }}>{Object.entries(b.selfRatings || {}).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]).map(([k,v]) => <span key={k} style={{ fontSize: 9, padding: "2px 6px", borderRadius: 6, background: v === 2 ? "rgba(5,150,105,.12)" : "rgba(245,158,11,.12)", color: v === 2 ? "#059669" : "#f59e0b", fontWeight: 600 }}>{sL(k)} {v === 2 ? "★" : "●"}</span>)}</div>
+            {Object.entries(b.answers || {}).map(([k,v]) => v && <div key={k} style={{ marginBottom: 8 }}><div style={{ fontSize: 9, fontWeight: 700, color: "var(--ac)" }}>{k.toUpperCase()}</div><div style={{ fontSize: 11, color: "var(--tx)", lineHeight: 1.5 }}>{v}</div></div>)}
+          </div>}
+        </div>)}
+      </div>;
+    }
+
     function App() {
       const [users, setUsers] = React.useState([]); const [emps, setEmps] = React.useState([]);
       const [files, setFiles] = React.useState([]); const [cfg, setCfg] = React.useState({});
@@ -809,27 +830,7 @@
               {[{ k: "accounts", l: "👥 Accounts" }, { k: "clusters", l: "📋 Clusters" }, { k: "subskills", l: "🔧 Subskills" }, { k: "visibility", l: "👁 Sichtbarkeit" }, { k: "bewerbungen", l: "📋 Newbe" }].map(tab => <button key={tab.k} onClick={() => setStab(tab.k)} style={{ flex: 1, padding: "8px 12px", borderRadius: 8, border: "none", fontSize: 12, fontWeight: 700, cursor: "pointer", background: stab === tab.k ? (dark ? "var(--ac)" : "#0f172a") : "transparent", color: stab === tab.k ? "#fff" : "var(--tx2)", transition: "all .15s" }}>{tab.l}</button>)}
             </div>
 
-            {/* --- BEWERBUNGEN TAB --- */}
-            {stab === "bewerbungen" && (() => {
-              const [bew, setBew] = React.useState([]); const [bSel, setBSel] = React.useState(null);
-              React.useEffect(() => { (async () => { try { const r = await fetch(`${SB_URL}/rest/v1/sd_files?select=*`, { headers: sbHeaders }); const rows = await r.json(); if (Array.isArray(rows)) setBew(rows.filter(r => r.data?.type === 'newbe_form').map(r => r.data).sort((a,b) => new Date(b.submittedAt) - new Date(a.submittedAt))); } catch(e) { console.error(e); } })(); }, []);
-              const sel = bSel ? bew.find(b => b.id === bSel) : null;
-              return <div className="dark-card" style={{ background: dark ? "#1e293b" : "#fff", borderRadius: 12, border: "1px solid var(--bd)", overflow: "hidden" }}>
-                <div style={{ padding: "12px 18px", borderBottom: "1px solid var(--bd)", fontWeight: 700, fontSize: 14 }}>📋 {lang === "de" ? "Newbe-Bewerbungen" : "Hồ sơ Newbe"} <span style={{ fontSize: 10, color: "var(--tx2)", fontWeight: 500 }}>({bew.length})</span></div>
-                {bew.length === 0 && <div style={{ padding: 24, textAlign: "center", color: "var(--tx2)", fontSize: 12 }}>{lang === "de" ? "Noch keine Bewerbungen" : "Chưa có hồ sơ nào"}</div>}
-                {bew.map(b => <div key={b.id} onClick={() => setBSel(bSel === b.id ? null : b.id)} style={{ padding: "10px 18px", borderBottom: "1px solid var(--bd)", cursor: "pointer", background: bSel === b.id ? (dark ? "rgba(37,99,235,.06)" : "rgba(37,99,235,.03)") : "transparent" }}>
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                    <div><span style={{ fontWeight: 700, fontSize: 13 }}>{b.name}</span> <span style={{ fontSize: 10, color: "var(--ac)", background: "rgba(37,99,235,.08)", padding: "1px 6px", borderRadius: 6, fontWeight: 600 }}>{b.position}</span></div>
-                    <span style={{ fontSize: 9, color: "var(--tx2)" }}>{new Date(b.submittedAt).toLocaleDateString()}</span>
-                  </div>
-                  {bSel === b.id && <div style={{ marginTop: 10 }}>
-                    <div style={{ fontSize: 10, fontWeight: 700, color: "var(--tx2)", marginBottom: 6 }}>⭐ {lang === "de" ? "Selbsteinschätzung" : "Tự đánh giá"}</div>
-                    <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 12 }}>{Object.entries(b.selfRatings || {}).filter(([,v]) => v > 0).sort((a,b) => b[1]-a[1]).map(([k,v]) => <span key={k} style={{ fontSize: 9, padding: "2px 6px", borderRadius: 6, background: v === 2 ? "rgba(5,150,105,.12)" : "rgba(245,158,11,.12)", color: v === 2 ? "#059669" : "#f59e0b", fontWeight: 600 }}>{sL(k)} {v === 2 ? "★" : "●"}</span>)}</div>
-                    {Object.entries(b.answers || {}).map(([k,v]) => v && <div key={k} style={{ marginBottom: 8 }}><div style={{ fontSize: 9, fontWeight: 700, color: "var(--ac)" }}>{k.toUpperCase()}</div><div style={{ fontSize: 11, color: "var(--tx)", lineHeight: 1.5 }}>{v}</div></div>)}
-                  </div>}
-                </div>)}
-              </div>;
-            })()}
+            {stab === "bewerbungen" && <BewerbungenTab dark={dark} lang={lang} />}
 
             {/* --- ACCOUNTS TAB --- */}
             {stab === "accounts" && <div className="dark-card" style={{ background: dark ? "#1e293b" : "#fff", borderRadius: 12, border: "1px solid var(--bd)", overflow: "hidden" }}>
